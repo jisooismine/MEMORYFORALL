@@ -6,16 +6,16 @@ const postSchema = mongoose.Schema({
     creator: String,
     tags: [String],
     selectedFile: String,
-    likeCount: {
-        type: Number,
-        default: 0,
-    },
+    likes: {
+        type: [String],
+        default: [],
+      },
     createdAt: {
         type: Date,
         default: new Date(),
     },
 })
 
-var PostMessage = mongoose.model('PostMessage', postSchema);
+var PostMessage = mongoose.model('PostMessage', postSchema); //Model代表的是数据库中的集合，通过Model才能对数据库进行操作
 
 export default PostMessage;
