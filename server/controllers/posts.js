@@ -3,13 +3,16 @@ import PostMessage from "../models/postMessage.js";
 
 export const getPosts = async (req, res) => {
   try {
-    const postMessages = await PostMessage.find();
-
-    res.status(200).json(postMessages);
+      const { page } = req.query;
+      const LIMIT = 8;
+      const startIndex = (Number(page) - 1) * LIMIT;  //获得每一页的起始标签 首先每一页都有8个 但是从0开始
+      const total = await PostMessage.countDocuments({}); //获得所有的post数量
+      const posts = await PostMessage.find().sort({ _id: -1 }).limit(LIMIT).skip(startIndex);
+      res.status(200).json({ data: posts, currentPage: Number(page), numberOfPages: Math.ceil(total / LIMIT) });
   } catch (error) {
-    res.status(404).json({ message: error.message });
+      res.status(404).json({ message: error.message });
   }
-};
+}
 
 export const createPost = async (req, res) => {
   const post = req.body;
@@ -90,7 +93,7 @@ export const likePost = async (req, res) => {
 export const getPostsBySearch= async (req, res) => {
   try {
       const { searchQuery, tags } = req.query;
-      const title = new RegExp(searchQuery, 'i');
+      const title = new RegExp(searchQuery, 'i'); 
       const posts = await PostMessage.find({
           $or: [{ title }, { tags: { $in: tags.split(',') } }]
       });
@@ -98,4 +101,4 @@ export const getPostsBySearch= async (req, res) => {
   } catch (error) {
       res.status(404).json({ message: error });
   }
-},
+}
